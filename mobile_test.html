@@ -513,11 +513,25 @@
       const cellToFocus = opts.forceStart ? word.cells[0] : (opts.focusAt || firstEmptyCell(word) || word.cells[0]);
       state.cursor = { r: cellToFocus.r, c: cellToFocus.c };
       updateHighlights();
-      const cellEl = cellAt(cellToFocus.r, cellToFocus.c); cellEl?.scrollIntoView({block:'nearest', inline:'nearest'});
+
+      // NEW: Scroll the grid container into view when a clue is clicked.
+      // This is especially helpful on mobile where clues are below the grid.
+      const gridWrap = document.querySelector('.grid-wrap');
+      gridWrap?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      const cellEl = cellAt(cellToFocus.r, cellToFocus.c);
+      // This ensures the specific cell is visible within the grid's scrollable area.
+      cellEl?.scrollIntoView({block:'nearest', inline:'nearest'});
+
       document.querySelectorAll('.clue').forEach(el=>el.classList.remove('active'));
-      const clueEl = document.getElementById(`clue-${word.id}`); if (clueEl){ clueEl.classList.add('active'); clueEl.scrollIntoView({block:'nearest'}); }
-      
-      // ADDED: Focus the hidden input to bring up mobile keyboard
+      const clueEl = document.getElementById(`clue-${word.id}`);
+      if (clueEl){
+        clueEl.classList.add('active');
+        // REMOVED: This was preventing the scroll to the grid by scrolling back to the clue.
+        // clueEl.scrollIntoView({block:'nearest'});
+      }
+
+      // Focus the hidden input to bring up mobile keyboard
       document.getElementById('mobileInput').focus();
     }
 
